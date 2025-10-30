@@ -12,13 +12,27 @@ A comprehensive, open-source toolset for converting PyTorch models written in Py
 
 ## ✨ Features
 
+### 🎯 Complete Pipeline Conversion (Not Just Models!)
+
+Most tools only convert the neural network model. **We convert your ENTIRE production pipeline:**
+
+- ✅ **Data Preprocessing**: Normalization, scaling, clipping, missing value handling
+- ✅ **Model Inference**: PyTorch models to optimized C++/Rust
+- ✅ **Postprocessing**: Softmax, argmax, top-k, NMS, confidence filtering
+- ✅ **Math Operations**: NumPy-like operations (mean, std, sqrt, exp, log, etc.)
+- ✅ **Image Processing**: Normalization, transformations
+- ✅ **Time Series**: Moving averages, temporal smoothing
+- ✅ **Complete Workflow**: Everything researchers write in Python!
+
+### 🚀 Core Features
+
 - 🔄 **Automatic Conversion**: Parse PyTorch models and generate equivalent C++/Rust code
-- 🎯 **No External Libraries**: Generated code has zero dependencies on ML frameworks
+- 🎯 **Zero External Dependencies**: Generated code uses only standard C++17 or Rust std library
 - ⚡ **Optimized for Embedded**: Built-in quantization, pruning, and memory optimization
 - 📊 **Performance Benchmarking**: Compare Python vs C++ vs Rust implementations
-- 📚 **Rich Examples**: Pre-built conversions for common architectures (MLP, CNN, RNN, LSTM)
+- 📚 **Rich Examples**: Pre-built conversions for MLP, CNN, complete production pipelines
 - 🛠️ **Easy CLI**: Simple command-line interface for quick conversions
-- 📖 **Comprehensive Docs**: Step-by-step guides for every use case
+- 📖 **Comprehensive Docs**: Step-by-step guides for converting entire pipelines
 
 ## 🚀 Quick Start
 
@@ -78,6 +92,81 @@ converter.to_rust(
     quantize='int8'
 )
 ```
+
+## 🔄 Complete Pipeline Conversion
+
+### What Makes This Different?
+
+**Traditional tools**: Convert only the neural network model
+**Embedded ML**: Convert your ENTIRE production pipeline
+
+### Example: From Python Research Code to Embedded C++
+
+**Your Python Code:**
+```python
+def production_pipeline(raw_data):
+    # Preprocessing
+    data = handle_missing_values(raw_data)
+    data = np.clip(data, -5, 5)
+    data = (data - mean) / std
+    data = np.log1p(np.abs(data)) * np.sign(data)
+
+    # Model inference
+    output = model(data)
+
+    # Postprocessing
+    probs = softmax(output)
+    top_k = np.argsort(probs)[-5:][::-1]
+    return filter_by_confidence(top_k, threshold=0.7)
+```
+
+**Generated C++ Code (using our utilities):**
+```cpp
+#include "preprocessing.hpp"
+#include "postprocessing.hpp"
+#include "math_utils.hpp"
+
+auto production_pipeline(const Tensor<float>& raw_data) {
+    // Preprocessing (same logic as Python!)
+    auto data = handle_missing_values(raw_data);
+    preprocessing::clip(data, -5.0f, 5.0f);
+    auto normalized = preprocessing::StandardScaler<float>::transform_with_params(data, MEAN, STD);
+    apply_log_transform(normalized);
+
+    // Model inference
+    auto output = model.forward(normalized.data());
+
+    // Postprocessing (same logic as Python!)
+    Tensor<float> probs({output.size()}, output);
+    activations::softmax(probs);
+    auto topk = postprocessing::topk(probs, 5);
+    return filter_by_confidence(topk, 0.7f);
+}
+```
+
+### Comprehensive Utility Libraries
+
+**Preprocessing** (`preprocessing.hpp`):
+- StandardScaler, MinMaxScaler
+- Image normalization (ImageNet, custom)
+- Missing value imputation
+- Clipping, log transforms
+
+**Math Operations** (`math_utils.hpp`):
+- NumPy-like operations: mean, std, sqrt, exp, log, abs
+- Linear algebra: dot, matmul, norm, normalize
+- Statistics: median, variance, percentile, correlation
+- Random number generation
+
+**Postprocessing** (`postprocessing.hpp`):
+- Argmax, top-k selection
+- Non-Maximum Suppression (NMS)
+- Temperature scaling
+- Moving average filters
+- Ensemble voting
+- Confusion matrix
+
+**See the [Complete Pipeline Guide](docs/python_to_embedded_guide.md) for detailed examples!**
 
 ## 📁 Project Structure
 
