@@ -1,0 +1,31 @@
+[package]
+name = "embedded_ml_runtime"
+version = "0.1.0"
+edition = "2021"
+authors = ["Embedded ML Contributors"]
+description = "Lightweight ML inference runtime for embedded systems - zero dependencies"
+license = "MIT"
+keywords = ["embedded", "machine-learning", "inference", "no-std"]
+categories = ["embedded", "no-std", "science"]
+
+[dependencies]
+# No dependencies - uses only Rust standard library
+
+[dev-dependencies]
+
+[features]
+default = ["std"]
+std = []
+# no_std support for bare metal embedded systems
+no_std = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.release-embedded]
+inherits = "release"
+opt-level = "z"  # Optimize for size
+strip = true
